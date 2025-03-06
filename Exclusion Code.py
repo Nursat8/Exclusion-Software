@@ -35,13 +35,14 @@ if uploaded_file:
     st.dataframe(filtered_df.head())
 
     # **💡 Adjustable Exclusion Thresholds (Using Sliders)**
+   # **💡 Adjustable Exclusion Thresholds (Using Input Fields)**
     st.sidebar.header("🔧 Adjust Exclusion Thresholds")
 
-    alcohol_threshold = st.sidebar.slider("Alcohol Threshold (%)", 0, 100, 10)
-    gambling_threshold = st.sidebar.slider("Gambling Threshold (%)", 0, 100, 5)
-    adult_entertainment_threshold = st.sidebar.slider("Adult Entertainment Threshold (%)", 0, 100, 5)
-    palm_oil_threshold = st.sidebar.slider("Palm Oil Threshold (%)", 0, 100, 5)
-    pesticides_threshold = st.sidebar.slider("Pesticides Threshold (%)", 0, 100, 20)
+    alcohol_threshold = st.sidebar.number_input("Alcohol Threshold (%)", min_value=0, max_value=100, value=10)
+    gambling_threshold = st.sidebar.number_input("Gambling Threshold (%)", min_value=0, max_value=100, value=5)
+    adult_entertainment_threshold = st.sidebar.number_input("Adult Entertainment Threshold (%)", min_value=0, max_value=100, value=5)
+    palm_oil_threshold = st.sidebar.number_input("Palm Oil Threshold (%)", min_value=0, max_value=100, value=5)
+    pesticides_threshold = st.sidebar.number_input("Pesticides Threshold (%)", min_value=0, max_value=100, value=20)
 
     # Define Exclusion Rules (Using User-Selected Thresholds)
     exclusion_rules = {
