@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import io
 import openpyxl
+import matplotlib.pyplot as plt
 
 # Streamlit App Title
 st.title("📊 Company Filtering & Exclusion App")
@@ -73,6 +74,37 @@ if uploaded_file:
     # Remove "Exclusion Reason" from retained companies
     retained_df = retained_df.drop(columns=["Exclusion Reason"], errors='ignore')
 
+    # Statistics
+    st.subheader("📈 Exclusion Statistics")
+    total_companies = len(df)
+    excluded_companies = len(excluded_df)
+    retained_companies = len(retained_df)
+    
+    st.write(f"Total Companies: {total_companies}")
+    st.write(f"Excluded Companies: {excluded_companies}")
+    st.write(f"Retained Companies: {retained_companies}")
+
+    # Sector-based statistics (if sector column exists)
+    if "Sector" in df.columns:
+        sector_exclusion = excluded_df["Sector"].value_counts()
+        sector_retention = retained_df["Sector"].value_counts()
+        
+        st.subheader("📊 Exclusion by Sector")
+        st.write("### Excluded Companies by Sector")
+        st.bar_chart(sector_exclusion)
+        
+        st.write("### Retained Companies by Sector")
+        st.bar_chart(sector_retention)
+    
+    # Exclusion percentage statistics
+    exclusion_percentages = (excluded_df[exclusion_columns] > 0).sum(axis=1)
+    bins = list(range(0, 105, 5))  # 0-100% in 5% increments
+    exclusion_distribution = pd.cut(exclusion_percentages, bins=bins).value_counts().sort_index()
+    
+    st.subheader("📊 Exclusion Distribution")
+    st.write("### Number of Companies Excluded by Percentage")
+    st.bar_chart(exclusion_distribution)
+    
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
