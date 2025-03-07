@@ -18,30 +18,30 @@ if uploaded_file:
     
     if run_processing:
         # Proceed with file processing
-    run_processing = st.sidebar.button("Run Processing")
+        run_processing = st.sidebar.button("Run Processing")
 
     if run_processing:
         # Proceed with file processing
-    run_processing = st.sidebar.button("Run Processing")
+        run_processing = st.sidebar.button("Run Processing")
     
     if run_processing:
         # Load Excel file with formatting preserved
     
     # Sidebar button to trigger processing
-    run_processing = st.sidebar.button("Run Processing")
+        run_processing = st.sidebar.button("Run Processing")
     
     if run_processing:
-    run_processing = st.sidebar.button("Run Processing")
+        run_processing = st.sidebar.button("Run Processing")
 
     if run_processing:
-    run_processing = st.sidebar.button("Run Processing")
-        if run_processing:
-    run_processing = st.sidebar.button("Run Processing")
+        run_processing = st.sidebar.button("Run Processing")
+            if run_processing:
+        run_processing = st.sidebar.button("Run Processing")
     if run_processing:
     # Load Excel file with formatting preserved
-    workbook = openpyxl.load_workbook(uploaded_file)
-    sheet_name = workbook.sheetnames[0]  # Assuming data is in the first sheet
-    df = pd.read_excel(uploaded_file, sheet_name=sheet_name, skiprows=5, engine='openpyxl')
+        workbook = openpyxl.load_workbook(uploaded_file)
+        sheet_name = workbook.sheetnames[0]  # Assuming data is in the first sheet
+        df = pd.read_excel(uploaded_file, sheet_name=sheet_name, skiprows=5, engine='openpyxl')
 
     # Preserve original column names
     original_columns = df.columns.tolist()
