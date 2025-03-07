@@ -3,8 +3,13 @@ import pandas as pd
 import io
 import openpyxl
 
+import streamlit as st
+import pandas as pd
+import io
+import openpyxl
+
 # Streamlit App Title
-st.title("Company Filtering & Exclusion App")
+st.title("📊 Company Filtering & Exclusion App")
 
 # File Uploader
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
@@ -15,21 +20,22 @@ if uploaded_file:
     sector_exclusion = st.sidebar.checkbox("Exclude companies involved in sector")
 
     exclusion_categories = {
-        "Alcohol": 10,
-        "Gambling": 5,
-        "Adult Entertainment": 5,
-        "Palm Oil": 5,
-        "Pesticides": 20,
-        "Tobacco": 0,
-        "Production (Tobacco)": 0,
         "Nuclear Weapons": 0,
         "Depleted Uranium": 0,
+        "Incendiary Weapons": 0,
         "Blinding Laser Weapons": 0,
         "Cluster Munitions": 0,
         "Anti-Personnel Mines": 0,
         "Biological and Chemical Weapons": 0,
-        "Retail (Cannabis - Recreational)": 10,
-        "Wholesale (Cannabis - Recreational)": 5
+        "Tobacco": 0,
+        "Production (Tobacco)": 0,
+        "Alcohol": 10,
+        "Gambling": 5,
+        "Adult Entertainment": 5,
+        "Palm Oil": 5,
+        "Retail (Cannabis - Recreational)": 0,
+        "Wholesale (Cannabis - Recreational)": 0
+        "Pesticides": 20,
     }
 
     # User-defined thresholds
