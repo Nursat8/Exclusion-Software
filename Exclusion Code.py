@@ -19,10 +19,8 @@ if uploaded_file:
     original_columns = df.columns.tolist()
 
     # Rename the first column explicitly if unnamed
-    df.rename(columns={df.columns[0]: "Company Name"}, inplace=True)
-
-    # Strip spaces from column names but maintain original formatting
-    df.columns = df.columns.str.strip()
+    if "Unnamed: 0" in df.columns:
+        df.rename(columns={"Unnamed: 0": "Company Name"}, inplace=True)
 
     # Identify exclusion columns dynamically
     exclusion_columns = [col for col in df.columns if "SP_ESG_BUS_INVOLVE_REV_PCT" in col]
@@ -68,11 +66,13 @@ if uploaded_file:
     retained_df = df[df["Exclusion Reason"] == ""].copy()
 
     # Remove "Exclusion Reason" from retained companies
-    retained_df = retained_df.drop(columns=["Exclusion Reason"])
-
-    # Restore original column names for consistency
-    retained_df.columns = original_columns[:-1]  # Excluding "Exclusion Reason"
-    excluded_df.columns = original_columns
+    retained_df = retained_df.drop(columns=["Exclusion Reason"], errors='ignore')
+    
+    # Ensure column count matches before restoring original column names
+    if len(retained_df.columns) == len(original_columns) - 1:
+        retained_df.columns = original_columns[:-1]  # Excluding "Exclusion Reason"
+    if len(excluded_df.columns) == len(original_columns):
+        excluded_df.columns = original_columns
 
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
