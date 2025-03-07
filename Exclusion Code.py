@@ -26,7 +26,7 @@ if uploaded_file:
     df[exclusion_columns] = df[exclusion_columns].apply(pd.to_numeric, errors='coerce')
 
     # Apply filtering: Remove companies where any exclusion column has revenue > 0%
-    filtered_df = df[~(df[exclusion_columns] > 0).any(axis=1)]
+    filtered_df = df[~(df[exclusion_columns] > 0).any(axis=1)].copy()
 
     st.success("✅ Filtering completed!")
 
@@ -34,37 +34,28 @@ if uploaded_file:
     st.subheader("Filtered Companies Preview:")
     st.dataframe(filtered_df.head())
 
-    # **💡 Adjustable Exclusion Thresholds (Using Sliders)**
-   # **💡 Adjustable Exclusion Thresholds (Using Input Fields)**
+    # Sidebar for threshold adjustments
     st.sidebar.header("🔧 Adjust Exclusion Thresholds")
-
-    alcohol_threshold = st.sidebar.number_input("Alcohol Threshold (%)", min_value=0, max_value=100, value=10)
-    gambling_threshold = st.sidebar.number_input("Gambling Threshold (%)", min_value=0, max_value=100, value=5)
-    adult_entertainment_threshold = st.sidebar.number_input("Adult Entertainment Threshold (%)", min_value=0, max_value=100, value=5)
-    palm_oil_threshold = st.sidebar.number_input("Palm Oil Threshold (%)", min_value=0, max_value=100, value=5)
-    pesticides_threshold = st.sidebar.number_input("Pesticides Threshold (%)", min_value=0, max_value=100, value=20)
-
-    # Define Exclusion Rules (Using User-Selected Thresholds)
-    exclusion_rules = {
-        "Alcohol": ("Alcohol", alcohol_threshold),  
-        "Gambling": ("Gambling", gambling_threshold),
-        "Adult Entertainment": ("Adult Entertainment", adult_entertainment_threshold),
-        "Palm Oil": ("Palm Oil", palm_oil_threshold),
-        "Pesticides": ("Pesticides", pesticides_threshold)
+    exclusion_thresholds = {
+        "Alcohol": st.sidebar.number_input("Alcohol Threshold (%)", min_value=0, max_value=100, value=10),
+        "Gambling": st.sidebar.number_input("Gambling Threshold (%)", min_value=0, max_value=100, value=5),
+        "Adult Entertainment": st.sidebar.number_input("Adult Entertainment Threshold (%)", min_value=0, max_value=100, value=5),
+        "Palm Oil": st.sidebar.number_input("Palm Oil Threshold (%)", min_value=0, max_value=100, value=5),
+        "Pesticides": st.sidebar.number_input("Pesticides Threshold (%)", min_value=0, max_value=100, value=20)
     }
 
-    # Convert relevant columns to numeric
-    for category, (column, threshold) in exclusion_rules.items():
-        if column in df.columns:
-            df[column] = pd.to_numeric(df[column], errors="coerce")
+    # Convert relevant columns to numeric if they exist in the dataset
+    for category, threshold in exclusion_thresholds.items():
+        if category in df.columns:
+            df[category] = pd.to_numeric(df[category], errors="coerce")
 
     # Initialize exclusion tracking
     df["Exclusion Reason"] = ""
 
     # Apply exclusion criteria
-    for category, (column, threshold) in exclusion_rules.items():
-        if column in df.columns:
-            df.loc[df[column] > threshold, "Exclusion Reason"] += f"{category} revenue > {threshold}%; "
+    for category, threshold in exclusion_thresholds.items():
+        if category in df.columns:
+            df.loc[df[category] > threshold, "Exclusion Reason"] += f"{category} revenue > {threshold}%; "
 
     # Separate included and excluded companies
     excluded_df = df[df["Exclusion Reason"] != ""].copy()
@@ -87,7 +78,7 @@ if uploaded_file:
     st.download_button(
         label="📥 Download Exclusion File",
         data=output.getvalue(),
-        file_name="Excluded_Companies.xlsx",
+        file_name="Filtered_SPGlobal_Output.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
