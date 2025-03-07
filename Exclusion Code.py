@@ -28,8 +28,8 @@ if uploaded_file:
         "Cluster Munitions": 0,
         "Anti-Personnel Mines": 0,
         "Biological and Chemical Weapons": 0,
-        "Retail (Cannabis - Recreational)": 0,
-        "Wholesale (Cannabis - Recreational)": 0
+        "Retail (Cannabis - Recreational)": 10,
+        "Wholesale (Cannabis - Recreational)": 5
     }
 
     # User-defined thresholds
