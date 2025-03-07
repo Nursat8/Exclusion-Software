@@ -10,6 +10,8 @@ st.title("📊 Company Filtering & Exclusion App")
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
 if uploaded_file:
+    run_processing = st.sidebar.button("Run Processing")
+    if run_processing:
     # Load Excel file with formatting preserved
     workbook = openpyxl.load_workbook(uploaded_file)
     sheet_name = workbook.sheetnames[0]  # Assuming data is in the first sheet
@@ -45,7 +47,7 @@ if uploaded_file:
         "Palm Oil": 5,
         "Pesticides": 20,
         "Tobacco": 0,
-        "Tobacco (Production)": 0,
+        "Production (Tobacco)": 0,
         "Nuclear Weapons": 0,
         "Depleted Uranium": 0,
         "Blinding Laser Weapons": 0,
