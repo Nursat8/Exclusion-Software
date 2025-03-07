@@ -91,19 +91,24 @@ if uploaded_file:
         
         st.subheader("📊 Exclusion by Sector")
         st.write("### Excluded Companies by Sector")
-        st.bar_chart(sector_exclusion)
+        fig1, ax1 = plt.subplots()
+        sector_exclusion.plot(kind='bar', ax=ax1)
+        st.pyplot(fig1)
         
         st.write("### Retained Companies by Sector")
-        st.bar_chart(sector_retention)
+        fig2, ax2 = plt.subplots()
+        sector_retention.plot(kind='bar', ax=ax2)
+        st.pyplot(fig2)
     
     # Exclusion percentage statistics
     exclusion_percentages = (excluded_df[exclusion_columns] > 0).sum(axis=1)
-    bins = list(range(0, 105, 5))  # 0-100% in 5% increments
-    exclusion_distribution = pd.cut(exclusion_percentages, bins=bins).value_counts().sort_index()
+    exclusion_distribution = exclusion_percentages.value_counts().sort_index()
     
     st.subheader("📊 Exclusion Distribution")
     st.write("### Number of Companies Excluded by Percentage")
-    st.bar_chart(exclusion_distribution)
+    fig3, ax3 = plt.subplots()
+    exclusion_distribution.plot(kind='bar', ax=ax3)
+    st.pyplot(fig3)
     
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
