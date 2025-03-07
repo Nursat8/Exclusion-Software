@@ -10,6 +10,14 @@ st.title("📊 Company Filtering & Exclusion App")
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
 if uploaded_file:
+    
+    # Ensure the block has at least a placeholder comment
+    pass
+    
+    run_processing = st.sidebar.button("Run Processing")
+    
+    if run_processing:
+        # Proceed with file processing
     run_processing = st.sidebar.button("Run Processing")
 
     if run_processing:
