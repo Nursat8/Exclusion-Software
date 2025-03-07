@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import io
 import openpyxl
-import xlsxwriter
 
 # Streamlit App Title
 st.title("📊 Company Filtering & Exclusion App")
@@ -70,17 +69,15 @@ if uploaded_file:
 
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
-    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-        workbook = openpyxl.load_workbook(uploaded_file)
-        sheet_format = workbook[sheet_name]
+    with pd.ExcelWriter(output, engine="openpyxl") as writer:
         retained_df.to_excel(writer, sheet_name="Retained Companies", index=False)
         excluded_df.to_excel(writer, sheet_name="Excluded Companies", index=False)
-        writer.book.use_xlsxwriter()
+    output.seek(0)
     
     # Download button for the exclusion file
     st.download_button(
         label="📥 Download Exclusion File",
-        data=output.getvalue(),
+        data=output,
         file_name="Filtered_SPGlobal_Output.xlsx",
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
