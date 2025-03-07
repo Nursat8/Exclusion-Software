@@ -7,7 +7,7 @@ import openpyxl
 st.title("📊 Company Filtering & Exclusion App")
 
 # File Uploader
-uploaded_file = st.file_uploader("📂 Upload an Excel file", type=["xlsx"])
+uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
 if uploaded_file:
     # Load Excel file with formatting preserved
@@ -87,7 +87,7 @@ if uploaded_file:
     st.write(f"Retained Companies: {retained_companies}")
     
     # Display exclusion counts per category
-    st.subheader("📊 Companies Excluded by Reason")
+    st.subheader("📊 Companies Excluded by Sector")
     for category, count in exclusion_counts.items():
         st.write(f"{category}: {count} companies excluded")
 
