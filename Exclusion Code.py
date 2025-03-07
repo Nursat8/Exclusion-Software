@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import io
+import openpyxl
+import xlsxwriter
 
 # Streamlit App Title
 st.title("📊 Company Filtering & Exclusion App")
@@ -9,8 +11,10 @@ st.title("📊 Company Filtering & Exclusion App")
 uploaded_file = st.file_uploader("📂 Upload an Excel file", type=["xlsx"])
 
 if uploaded_file:
-    # Load Excel file
-    df = pd.read_excel(uploaded_file, skiprows=5)  # Skip extra rows
+    # Load Excel file with formatting preserved
+    workbook = openpyxl.load_workbook(uploaded_file)
+    sheet_name = workbook.sheetnames[0]  # Assuming data is in the first sheet
+    df = pd.read_excel(uploaded_file, sheet_name=sheet_name, skiprows=5, engine='openpyxl')
 
     # Rename the first column to "Company Name"
     df.rename(columns={"Unnamed: 0": "Company Name"}, inplace=True)
@@ -64,15 +68,14 @@ if uploaded_file:
     # Remove "Exclusion Reason" from retained companies
     retained_df = retained_df.drop(columns=["Exclusion Reason"])
 
-    # Display preview of excluded companies
-    st.subheader("Excluded Companies Preview:")
-    st.dataframe(excluded_df[["Company Name", "Exclusion Reason"]].head())
-
-    # Save results to an in-memory Excel file
+    # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        workbook = openpyxl.load_workbook(uploaded_file)
+        sheet_format = workbook[sheet_name]
         retained_df.to_excel(writer, sheet_name="Retained Companies", index=False)
         excluded_df.to_excel(writer, sheet_name="Excluded Companies", index=False)
+        writer.book.use_xlsxwriter()
     
     # Download button for the exclusion file
     st.download_button(
