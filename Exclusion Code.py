@@ -10,6 +10,40 @@ st.title("📊 Company Filtering & Exclusion App")
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
 if uploaded_file:
+    # Sidebar for exclusion selection
+    st.sidebar.header("🔧 Exclusion Criteria")
+    sector_exclusion = st.sidebar.checkbox("Exclude companies involved in sector")
+
+    exclusion_categories = {
+        "Alcohol": 10,
+        "Gambling": 5,
+        "Adult Entertainment": 5,
+        "Palm Oil": 5,
+        "Pesticides": 20,
+        "Tobacco": 0,
+        "Production (Tobacco)": 0,
+        "Nuclear Weapons": 0,
+        "Depleted Uranium": 0,
+        "Blinding Laser Weapons": 0,
+        "Cluster Munitions": 0,
+        "Anti-Personnel Mines": 0,
+        "Biological and Chemical Weapons": 0,
+        "Retail (Cannabis - Recreational)": 0,
+        "Wholesale (Cannabis - Recreational)": 0
+    }
+
+    # User-defined thresholds
+    user_thresholds = {}
+    for category, default_value in exclusion_categories.items():
+        if st.sidebar.checkbox(f"Exclude {category}", value=True):
+            user_thresholds[category] = st.sidebar.number_input(
+                f"{category} Threshold (%)", min_value=0, max_value=100, value=default_value
+            )
+    
+    # Sidebar button to trigger processing
+    run_processing = st.sidebar.button("Run Processing")
+    
+    if run_processing:
     # Sidebar button to trigger processing
     run_processing = st.sidebar.button("Run Processing")
     
