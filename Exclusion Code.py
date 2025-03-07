@@ -15,10 +15,13 @@ if uploaded_file:
     sheet_name = workbook.sheetnames[0]  # Assuming data is in the first sheet
     df = pd.read_excel(uploaded_file, sheet_name=sheet_name, skiprows=5, engine='openpyxl')
 
-    # Rename the first column to "Company Name"
-    df.rename(columns={"Unnamed: 0": "Company Name"}, inplace=True)
+    # Preserve original column names (spaces and formatting)
+    original_columns = df.columns.tolist()
 
-    # Strip spaces from column names
+    # Rename the first column explicitly if unnamed
+    df.rename(columns={df.columns[0]: "Company Name"}, inplace=True)
+
+    # Strip spaces from column names but maintain original formatting
     df.columns = df.columns.str.strip()
 
     # Identify exclusion columns dynamically
@@ -66,6 +69,10 @@ if uploaded_file:
 
     # Remove "Exclusion Reason" from retained companies
     retained_df = retained_df.drop(columns=["Exclusion Reason"])
+
+    # Restore original column names for consistency
+    retained_df.columns = original_columns[:-1]  # Excluding "Exclusion Reason"
+    excluded_df.columns = original_columns
 
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
