@@ -11,6 +11,9 @@ uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
 if uploaded_file:
     run_processing = st.sidebar.button("Run Processing")
+
+    if run_processing:
+    run_processing = st.sidebar.button("Run Processing")
         if run_processing:
     run_processing = st.sidebar.button("Run Processing")
     if run_processing:
