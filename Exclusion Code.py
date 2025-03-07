@@ -4,7 +4,7 @@ import io
 import openpyxl
 
 # Streamlit App Title
-st.title("📊 Company Filtering & Exclusion App")
+st.title("Company Filtering & Exclusion App")
 
 # File Uploader
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
