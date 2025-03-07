@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import io
 import openpyxl
-import matplotlib.pyplot as plt
 
 # Streamlit App Title
 st.title("📊 Company Filtering & Exclusion App")
@@ -61,11 +60,14 @@ if uploaded_file:
 
     # Initialize exclusion tracking
     df["Exclusion Reason"] = ""
+    exclusion_counts = {category: 0 for category in exclusion_thresholds.keys()}
 
     # Apply exclusion criteria
     for category, threshold in exclusion_thresholds.items():
         if category in df.columns:
-            df.loc[df[category] > threshold, "Exclusion Reason"] += f"{category} revenue > {threshold}%; "
+            mask = df[category] > threshold
+            df.loc[mask, "Exclusion Reason"] += f"{category} revenue > {threshold}%; "
+            exclusion_counts[category] += mask.sum()
 
     # Separate included and excluded companies
     excluded_df = df[df["Exclusion Reason"] != ""].copy()
@@ -83,33 +85,12 @@ if uploaded_file:
     st.write(f"Total Companies: {total_companies}")
     st.write(f"Excluded Companies: {excluded_companies}")
     st.write(f"Retained Companies: {retained_companies}")
+    
+    # Display exclusion counts per category
+    st.subheader("📊 Companies Excluded by Reason")
+    for category, count in exclusion_counts.items():
+        st.write(f"{category}: {count} companies excluded")
 
-    # Sector-based statistics (if sector column exists)
-    if "Sector" in df.columns:
-        sector_exclusion = excluded_df["Sector"].value_counts()
-        sector_retention = retained_df["Sector"].value_counts()
-        
-        st.subheader("📊 Exclusion by Sector")
-        st.write("### Excluded Companies by Sector")
-        fig1, ax1 = plt.subplots()
-        sector_exclusion.plot(kind='bar', ax=ax1)
-        st.pyplot(fig1)
-        
-        st.write("### Retained Companies by Sector")
-        fig2, ax2 = plt.subplots()
-        sector_retention.plot(kind='bar', ax=ax2)
-        st.pyplot(fig2)
-    
-    # Exclusion percentage statistics
-    exclusion_percentages = (excluded_df[exclusion_columns] > 0).sum(axis=1)
-    exclusion_distribution = exclusion_percentages.value_counts().sort_index()
-    
-    st.subheader("📊 Exclusion Distribution")
-    st.write("### Number of Companies Excluded by Percentage")
-    fig3, ax3 = plt.subplots()
-    exclusion_distribution.plot(kind='bar', ax=ax3)
-    st.pyplot(fig3)
-    
     # Save results to an in-memory Excel file while preserving format
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
