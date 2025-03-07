@@ -36,7 +36,7 @@ if uploaded_file:
     if run_processing:
         run_processing = st.sidebar.button("Run Processing")
             if run_processing:
-        run_processing = st.sidebar.button("Run Processing")
+                run_processing = st.sidebar.button("Run Processing")
     if run_processing:
     # Load Excel file with formatting preserved
         workbook = openpyxl.load_workbook(uploaded_file)
