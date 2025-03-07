@@ -4,7 +4,7 @@ import io
 import openpyxl
 
 # Streamlit App Title
-st.title("📊 Company Filtering & Exclusion App")
+st.title("Company Filtering & Exclusion App")
 
 # File Uploader
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
@@ -87,7 +87,7 @@ if uploaded_file:
     st.write(f"Retained Companies: {retained_companies}")
     
     # Display exclusion counts per category
-    st.subheader("📊 Companies Excluded by Sector")
+    st.subheader("Companies Excluded by Sector")
     for category, count in exclusion_counts.items():
         st.write(f"{category}: {count} companies excluded")
 
