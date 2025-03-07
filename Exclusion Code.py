@@ -3,11 +3,6 @@ import pandas as pd
 import io
 import openpyxl
 
-import streamlit as st
-import pandas as pd
-import io
-import openpyxl
-
 # Streamlit App Title
 st.title("📊 Company Filtering & Exclusion App")
 
