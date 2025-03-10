@@ -30,7 +30,7 @@ if uploaded_file:
         "Palm Oil": 5,
         "Retail (Cannabis - Recreational)": 0,
         "Wholesale (Cannabis - Recreational)": 0,
-        "Pesticides": 20
+
     }
 
     # User-defined thresholds
