@@ -9,7 +9,11 @@ st.title("Company Filtering & Exclusion App")
 # ---------- 1. File upload ----------
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
+# --------------------------------------------------------------------------- #
+# Everything that depends on a file goes INSIDE this block
+# --------------------------------------------------------------------------- #
 if uploaded_file:
+
     # ---------- 2. Exclusion settings ----------
     st.sidebar.header("🔧 Exclusion Criteria")
 
@@ -32,47 +36,42 @@ if uploaded_file:
         "Pesticides": 20,
     }
 
-    # 🔹 defaults for “include equals”
     default_inclusive = {
         "Gambling",
         "Retail (Cannabis - Recreational)",
         "Adult Entertainment",
     }
 
-# ---------- 3. Individual thresholds ----------
-st.sidebar.subheader("Exclude by Individual Category")
+    # ---------- 3. Individual thresholds ----------
+    st.sidebar.subheader("Exclude by Individual Category")
 
-user_thresholds = {}      # {category: value}
-inclusive_flags = {}      # {category: True/False}
+    user_thresholds  = {}
+    inclusive_flags  = {}
 
-for category, default_val in exclusion_categories.items():
-    # Each row:  [Exclude ☐   Category name………………]   [≥ ☐]
-    col_label, col_geq = st.sidebar.columns([7, 1])
+    for category, default_val in exclusion_categories.items():
+        # Row layout:  [Exclude ☐ Category name.............]  [≥ ☐]
+        col_lbl, col_geq = st.sidebar.columns([7, 1])
 
-    # left: big checkbox that turns the category on/off
-    apply_flag = col_label.checkbox(
-        category,
-        value=True,
-        key=f"chk_{category}",
-    )
-
-    # right: tiny ≥ toggle
-    inclusive_flags[category] = col_geq.checkbox(
-        "≥",
-        value=category in default_inclusive,
-        key=f"inc_{category}",
-    )
-
-    # threshold input appears only if Exclude is ticked
-    if apply_flag:
-        user_thresholds[category] = st.sidebar.number_input(
-            f"{category} Threshold (%)",
-            min_value=0,
-            max_value=100,
-            value=default_val,
-            key=f"num_thr_{category}",     # <── guaranteed-unique key
+        apply_flag = col_lbl.checkbox(
+            category,
+            value=True,
+            key=f"chk_{category}",
         )
 
+        inclusive_flags[category] = col_geq.checkbox(
+            "≥",
+            value=category in default_inclusive,
+            key=f"inc_{category}",
+        )
+
+        if apply_flag:
+            user_thresholds[category] = st.sidebar.number_input(
+                f"{category} Threshold (%)",
+                min_value=0,
+                max_value=100,
+                value=default_val,
+                key=f"num_thr_{category}",     # <-- unique key
+            )
 
     # ---------- 4. Custom sum rules ----------
     st.sidebar.subheader("Exclude by Custom Sum of Categories")
@@ -85,8 +84,8 @@ for category, default_val in exclusion_categories.items():
         step=1,
     )
 
-    custom_sum_definitions = []   # [(categories, threshold, inclusive)]
-    available_categories = list(exclusion_categories.keys())
+    custom_sum_definitions = []
+    available_categories   = list(exclusion_categories.keys())
 
     for i in range(int(sum_count)):
         st.sidebar.write(f"**Custom Sum #{i+1}**")
@@ -102,18 +101,19 @@ for category, default_val in exclusion_categories.items():
             value=10,
             key=f"sum_thr_{i}",
         )
-        incl_eq = st.sidebar.checkbox(        # 🔹
-            "Include equals (≥)",
+        inc = st.sidebar.checkbox(
+            "≥",
             value=False,
             key=f"sum_inc_{i}",
         )
-        custom_sum_definitions.append((cats, thr, incl_eq))
+        custom_sum_definitions.append((cats, thr, inc))
 
     # ---------- 5. Run button ----------
     run_processing = st.sidebar.button("Run Processing")
 
     # ---------- 6. Processing ----------
     if run_processing:
+        # (everything from your step 6 onward remains unchanged)
         # 6-a. Load file
         wb = openpyxl.load_workbook(uploaded_file)
         sheet_name = wb.sheetnames[0]
