@@ -31,8 +31,8 @@ if uploaded_file:
         "Gambling": 5,
         "Adult Entertainment": 5,
         "Palm Oil": 5,
-        "Retail (Cannabis - Recreational)": 0,
-        "Wholesale (Cannabis - Recreational)": 0,
+        "Retail (Cannabis - Recreational)": 10,
+        "Wholesale (Cannabis - Recreational)": 5,
         "Pesticides": 20,
     }
 
