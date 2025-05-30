@@ -39,28 +39,39 @@ if uploaded_file:
         "Adult Entertainment",
     }
 
-    # ---------- 3. Individual thresholds ----------
-    st.sidebar.subheader("Exclude by Individual Category")
+   # ---------- 3. Individual thresholds ----------
+st.sidebar.subheader("Exclude by Individual Category")
 
-    user_thresholds = {}          # {category: value}
-    inclusive_flags = {}          # {category: True/False}
+user_thresholds = {}      # {category: value}
+inclusive_flags = {}      # {category: True/False}
 
-    for category, default_val in exclusion_categories.items():
-        if st.sidebar.checkbox(f"Exclude {category}", value=True, key=f"chk_{category}"):
-            thresh = st.sidebar.number_input(
-                f"{category} Threshold (%)",
-                min_value=0,
-                max_value=100,
-                value=default_val,
-                key=f"thr_{category}",
-            )
-            incl_eq = st.sidebar.checkbox(
-                "Include equals (≥)",
-                value=category in default_inclusive,
-                key=f"inc_{category}",
-            )  # 🔹
-            user_thresholds[category] = thresh
-            inclusive_flags[category] = incl_eq
+for category, default_val in exclusion_categories.items():
+    # One horizontal row per category
+    col_cat, col_geq = st.sidebar.columns([7, 1])    # wide label, tiny toggle
+
+    # left-hand column: master “Exclude …” checkbox
+    apply_flag = col_cat.checkbox(
+        category,                       # label
+        value=True,                     # default = checked
+        key=f"chk_{category}",
+    )
+
+    # right-hand column: mini ≥ checkbox
+    inclusive_flags[category] = col_geq.checkbox(
+        "≥",                            # tiny label keeps it small
+        value=category in default_inclusive,
+        key=f"inc_{category}",
+    )
+
+    # only show threshold input when the category is enabled
+    if apply_flag:
+        user_thresholds[category] = st.sidebar.number_input(
+            f"{category} Threshold (%)",
+            min_value=0,
+            max_value=100,
+            value=default_val,
+            key=f"thr_{category}",
+        )
 
     # ---------- 4. Custom sum rules ----------
     st.sidebar.subheader("Exclude by Custom Sum of Categories")
