@@ -6,32 +6,6 @@ import openpyxl
 # ---------- 0. Title ----------
 st.title("Company Filtering & Exclusion App")
 
-st.markdown(
-    """
-    <style>
-    /* ---------- mini red checkbox used for ≥ ---------- */
-    .mini-box [data-testid="stCheckbox"] > div:first-child{
-        width: 0.9rem;
-        height: 0.9rem;
-        border-radius: 3px;
-        border: 2px solid #ff4b4b;
-    }
-    .mini-box [data-testid="stCheckbox"] input:checked + div:first-child{
-        background:#ff4b4b;
-    }
-    .mini-box [data-testid="stCheckbox"] svg{display:none;}
-    .mini-box [data-testid="stCheckbox"] input:checked + div:first-child:after{
-        content:"✓";
-        position:absolute;
-        left:0.12rem; top:-0.2rem;
-        color:#fff; font-size:0.8rem; font-weight:bold;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-
 # ---------- 1. File upload ----------
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
@@ -87,34 +61,6 @@ if uploaded_file:
             )  # 🔹
             user_thresholds[category] = thresh
             inclusive_flags[category] = incl_eq
-
-        with col_excl:
-            apply_flag = st.checkbox(
-                f"Exclude {category}",
-                value=True,
-                key=f"chk_{category}",
-            )
-
-        with col_ge:
-            # wrap the mini checkbox in a div so the CSS above only hits this one
-            st.markdown('<div class="mini-box">', unsafe_allow_html=True)
-            inclusive_flags[category] = st.checkbox(
-                "",                                           # no label
-                value=category in default_inclusive,
-                key=f"inc_{category}",
-            )
-            st.markdown("</div><span style='font-weight:bold;'>≥</span>",
-                        unsafe_allow_html=True)
-
-        # ---- threshold input appears underneath, only if main box ticked ----
-        if apply_flag:
-            user_thresholds[category] = st.sidebar.number_input(
-                f"{category} Threshold (%)",
-                min_value=0,
-                max_value=100,
-                value=default_val,
-                key=f"thr_{category}",
-            )
 
     # ---------- 4. Custom sum rules ----------
     st.sidebar.subheader("Exclude by Custom Sum of Categories")
