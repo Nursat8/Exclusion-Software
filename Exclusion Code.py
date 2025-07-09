@@ -63,7 +63,7 @@ if uploaded_file:
             value=category in default_inclusive,
             key=f"inc_{category}",
         )
-
+#)______====
         if apply_flag:
             user_thresholds[category] = st.sidebar.number_input(
                 f"{category} Threshold (%)",
