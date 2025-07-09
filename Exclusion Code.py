@@ -14,7 +14,7 @@ uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 # --------------------------------------------------------------------------- #
 if uploaded_file:
 
-    # ---------- 2. Exclusion settings ----------
+    # 2. 🔹 Exclusion settings. A dictionary with sectors and default percentage values set 🔹
     st.sidebar.header("🔧 Exclusion Criteria")
 
     exclusion_categories = {
@@ -35,47 +35,53 @@ if uploaded_file:
         "Wholesale (Cannabis - Recreational)": 5,
         "Pesticides": 20,
     }
-
+    # 🔹 Sectors that have more and equal to in the beginning 🔹
     default_inclusive = {
         "Gambling",
         "Retail (Cannabis - Recreational)",
         "Adult Entertainment",
     }
 
-    # ---------- 3. Individual thresholds ----------
+    # 3. 🔹 Individual thresholds.🔹
     st.sidebar.subheader("Exclude by Individual Category")
-
+    
+    # 🔹 Creating open dictionaries for threshold and possible "more and equal to" condition (inclusive_flags). Will be filled dynamically 🔹
     user_thresholds  = {}
     inclusive_flags  = {}
 
+    # 🔹 Sidebar UI for Streamlit. It creates two columns in the sidebar. The first column is for name of category and second "≥" checkbox. Sets "category" as first value of dictionary in exclusion_category and "default_val" as second value in dictionary 🔹    
     for category, default_val in exclusion_categories.items():
         # Row layout:  [Exclude ☐ Category name.............]  [≥ ☐]
         col_lbl, col_geq = st.sidebar.columns([7, 1])
-
+        
+        # 🔹 Sidebar UI for Streamlit. It checks all categories in the first column, which is name of category. Thus, thresholds for all sectors are activated in the beginning. 🔹 
+        # 🔹 key=f"chk_{category}" creates widgets by following this logic: chk_Alcohol (if categort is Alcohol). It is needed to create a special ID for each sector and loop it 🔹 
         apply_flag = col_lbl.checkbox(
             category,
             value=True,
             key=f"chk_{category}",
         )
-
+        # 🔹 Sidebar UI for Streamlit. It checks only sectors in default_inclusive. If category is in default_inclusive, it returns True; thus, value = True 🔹 
         inclusive_flags[category] = col_geq.checkbox(
             "≥",
             value=category in default_inclusive,
             key=f"inc_{category}",
         )
-#)______====
+      
+        # 🔹 Sidebar UI for Streamlit. Input of threshold. After all these, user_threshold is filled with data which have apply_flag == True and inclusive_flags == True. in the beginning, value is set to default_val. 🔹 
         if apply_flag:
             user_thresholds[category] = st.sidebar.number_input(
                 f"{category} Threshold (%)",
                 min_value=0,
                 max_value=100,
                 value=default_val,
-                key=f"num_thr_{category}",     # <-- unique key
+                key=f"num_thr_{category}",    
             )
 
-    # ---------- 4. Custom sum rules ----------
+    # 🔹 4. Custom sum rules 🔹
     st.sidebar.subheader("Exclude by Custom Sum of Categories")
-
+    
+    # 🔹 Sidebar UI for Streamlit 🔹
     sum_count = st.sidebar.number_input(
         "Number of custom sum criteria",
         min_value=0,
@@ -83,10 +89,13 @@ if uploaded_file:
         value=0,
         step=1,
     )
-
+    
+    # 🔹 Empty list custom_sum_definitions which is tuple that would consists of category (cats), threshold value (thr) and bolean (inc) for "equal and more than" 🔹
+    # 🔹 Available_category extracts only category names from exclusion_categories; These values are used to populate the multiselect widgets for the user to pick categories to sum 🔹
     custom_sum_definitions = []
     available_categories   = list(exclusion_categories.keys())
 
+    # 🔹 Sidebar UI for Streamlit. Shows categories for users and allows to set threshold and put checker for tuple custom_sum_definitions 🔹
     for i in range(int(sum_count)):
         st.sidebar.write(f"**Custom Sum #{i+1}**")
         cats = st.sidebar.multiselect(
@@ -108,20 +117,19 @@ if uploaded_file:
         )
         custom_sum_definitions.append((cats, thr, inc))
 
-    # ---------- 5. Run button ----------
+    # 🔹 5. Run button 🔹
     run_processing = st.sidebar.button("Run Processing")
 
-    # ---------- 6. Processing ----------
+    # 🔹 6. Processing 🔹
     if run_processing:
-        # (everything from your step 6 onward remains unchanged)
-        # 6-a. Load file
+        # 🔹 6-a. Load file 🔹
         wb = openpyxl.load_workbook(uploaded_file)
         sheet_name = wb.sheetnames[0]
         df = pd.read_excel(
             uploaded_file, sheet_name=sheet_name, skiprows=5, engine="openpyxl"
         )
 
-        # 6-b. Rename unnamed ID columns (optional, keep original list)
+        # 🔹 6-b. Rename unnamed ID columns (optional, keep original list). The output file had unnamed columns; thus, they are renamed 🔹
         rename_dict = {
             "Unnamed: 1": "SP_ENTITY_ID",
             "Unnamed: 2": "SP_COMPANY_ID",
@@ -130,27 +138,28 @@ if uploaded_file:
         }
         df.rename(columns=rename_dict, inplace=True)
 
-        # 6-c. Find numeric business-involvement columns
+        # 🔹 6-c. Find numeric business-involvement columns and data cleaning 🔹
         excl_cols = [c for c in df.columns if "SP_ESG_BUS_INVOLVE_REV_PCT" in c]
         df[excl_cols] = (
             df[excl_cols].replace({",": ".", " ": ""}, regex=True)
             .apply(pd.to_numeric, errors="coerce")
         )
 
-        # 6-d. Apply exclusions
+        # 🔹🔹🔹 6-d. Apply exclusions. Pre-create an empty string column; later we concatenate reason. Initialise per-category counters 🔹🔹🔹
         df["Exclusion Reason"] = ""
         exclusion_counts = {cat: 0 for cat in user_thresholds}
 
-        # (i) Individual categories
+        #  🔹 Individual categories. Check whether it is "equal or more than" or not by checking if inc = True (in the inclusive_flags list). And applies logic later through if else. 🔹
+        #  🔹 df.loc[mask, "Exclusion Reason"] += f"{cat} {op} {thr}%; " is needed for output file to see Exclusion Reason column in the output file 🔹
         for cat, thr in user_thresholds.items():
             if cat in df.columns:
-                inc = inclusive_flags[cat]          # 🔹
+                inc = inclusive_flags[cat]         
                 op = ">=" if inc else ">"
                 mask = df[cat] >= thr if inc else df[cat] > thr
                 df.loc[mask, "Exclusion Reason"] += f"{cat} {op} {thr}%; "
                 exclusion_counts[cat] += mask.sum()
 
-        # (ii) Custom sums
+        # 🔹 Custom sums. Row-wise sum across the selected category columns. df[cats] → selects just the columns listed in cats and ensures that every value is number 🔹
         for idx, (cats, thr, inc) in enumerate(custom_sum_definitions, 1):
             if cats:
                 sums = df[cats].apply(pd.to_numeric, errors="coerce").sum(axis=1)
@@ -161,13 +170,13 @@ if uploaded_file:
                     f"Sum of [{reason}] {op} {thr}%; "
                 )
 
-        # 6-e. Split retained / excluded
+        # 🔹 6-e. Split retained / excluded in the output file in the seperate sheets🔹
         excluded_df = df[df["Exclusion Reason"] != ""].copy()
         retained_df = df[df["Exclusion Reason"] == ""].drop(
             columns=["Exclusion Reason"], errors="ignore"
         )
 
-        # ---------- 7. Stats ----------
+        # 🔹 7. Stats. Shows exclusion_counts value for each category 🔹
         st.subheader("📈 Exclusion Statistics")
         st.write(f"Total Companies: {len(df)}")
         st.write(f"Excluded Companies: {len(excluded_df)}")
@@ -188,7 +197,7 @@ if uploaded_file:
                     f"Threshold: {thr}% {op}): {mask.sum()} companies excluded"
                 )
 
-        # ---------- 8. Download ----------
+        # 🔹 8. Download 🔹
         output = io.BytesIO()
         with pd.ExcelWriter(output, engine="openpyxl") as writer:
             retained_df.to_excel(writer, "Retained Companies", index=False)
