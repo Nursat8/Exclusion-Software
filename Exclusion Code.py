@@ -32,22 +32,22 @@ if uploaded_file:
         "Wholesale (Cannabis - Recreational)": 5,
         "Pesticides": 20,
     }
-    # 🔹 Sectors that have more and equal to in the beginning 🔹
+    # 🔹 Sectors that have revenue that is more and equal 🔹
     default_inclusive = {
         "Gambling",
         "Retail (Cannabis - Recreational)",
         "Adult Entertainment",
     }
 
-    # 3. 🔹 Individual thresholds.🔹
+    # 3. 🔹 UI. Individual thresholds.🔹
     st.sidebar.subheader("Exclude by Individual Category")
     
     # 🔹 Creating open dictionaries for threshold and possible "more and equal to" condition (inclusive_flags). Will be filled dynamically 🔹
     user_thresholds  = {}
     inclusive_flags  = {}
 
-    # 🔹 Sidebar UI for Streamlit. It creates two columns in the sidebar. The first column is for name of category and second "≥" checkbox. Sets "category" as first value of dictionary in exclusion_category and "default_val" as second value in dictionary 🔹    
-    for category, default_val in exclusion_categories.items():
+    # 🔹 Sidebar UI for Streamlit. It creates two columns in the sidebar. The first column is for name of category and second is for "≥" checkbox. Sets "category" as first value in the dictionary of exclusion_categories and default_inclusive as second value 🔹    
+    for threshold, default_val in exclusion_categories.items():
         # Row layout:  [Exclude ☐ Category name.............]  [≥ ☐]
         col_lbl, col_geq = st.sidebar.columns([7, 1])
         
