@@ -46,26 +46,27 @@ if uploaded_file:
     user_thresholds  = {}
     inclusive_flags  = {}
 
-    # 🔹 Sidebar UI for Streamlit. It creates two columns in the sidebar. The first column is for name of category and second is for "≥" checkbox. Sets "category" as first value in the dictionary of exclusion_categories and default_inclusive as second value 🔹    
+    # 🔹 Sidebar UI for Streamlit. It creates two columns in the sidebar. The first column is for name of category and second is for "≥" checkbox. 🔹
+    # 🔹 The code: Sets "category" (which is threshold value) as first value in the dictionary of exclusion_categories and default_val (which is tick) as second value 🔹    
     for category, default_val in exclusion_categories.items():
         # Row layout:  [Exclude ☐ Category name.............]  [≥ ☐]
         col_lbl, col_geq = st.sidebar.columns([7, 1])
         
-        # 🔹 Sidebar UI for Streamlit. It checks all categories in the first column, which is name of category. Thus, thresholds for all sectors are activated in the beginning. 🔹 
-        # 🔹 key=f"chk_{category}" creates widgets by following this logic: chk_Alcohol (if categort is Alcohol). It is needed to create a special ID for each sector and loop it 🔹 
+        # 🔹 Sidebar UI for Streamlit. It automatically ticks all sectors.🔹 
+        # 🔹 key=f"chk_{category}" creates widgets by following this logic: chk_Alcohol (if category is Alcohol). It is needed to create a special ID for each sector and loop it 🔹 
         apply_flag = col_lbl.checkbox(
             category,
             value=True,
             key=f"chk_{category}",
         )
-        # 🔹 Sidebar UI for Streamlit. It checks only sectors in default_inclusive. If category is in default_inclusive, it returns True; thus, value = True 🔹 
+        # 🔹 Sidebar UI for Streamlit. It checks only sectors in default_inclusive. If sector is in default_inclusive, it returns True; thus, value = True 🔹 
         inclusive_flags[category] = col_geq.checkbox(
             "≥",
             value=category in default_inclusive,
             key=f"inc_{category}",
         )
       
-        # 🔹 Sidebar UI for Streamlit. Input of threshold. After all these, user_threshold is filled with data which have apply_flag == True and inclusive_flags == True. in the beginning, value is set to default_val. 🔹 
+        # 🔹 Sidebar UI for Streamlit. Input of threshold. user_threshold is filled with data which have apply_flag == True and inclusive_flags == True. in the beginning, value is set to default_inclusive. 🔹 
         if apply_flag:
             user_thresholds[category] = st.sidebar.number_input(
                 f"{category} Threshold (%)",
@@ -78,7 +79,7 @@ if uploaded_file:
     # 🔹 4. Custom sum rules 🔹
     st.sidebar.subheader("Exclude by Custom Sum of Categories")
     
-    # 🔹 Sidebar UI for Streamlit 🔹
+    # 🔹 Sidebar UI for Streamlit For Custom Sum Rules🔹
     sum_count = st.sidebar.number_input(
         "Number of custom sum criteria",
         min_value=0,
@@ -87,12 +88,13 @@ if uploaded_file:
         step=1,
     )
     
-    # 🔹 Empty list custom_sum_definitions which is tuple that would consists of category (cats), threshold value (thr) and bolean (inc) for "equal and more than" 🔹
-    # 🔹 Available_category extracts only category names from exclusion_categories; These values are used to populate the multiselect widgets for the user to pick categories to sum 🔹
+    # 🔹 Empty list custom_sum_definitions which is tuple that would consists of sector (cats), threshold value (thr) and bolean (inc) for "equal and more than" 🔹
+    # 🔹 Code: Available_category extracts only category names from exclusion_categories; These values are used to populate the multiselect widgets for the user to pick categories to sum 🔹
     custom_sum_definitions = []
     available_categories   = list(exclusion_categories.keys())
 
-    # 🔹 Sidebar UI for Streamlit. Shows categories for users and allows to set threshold and put checker for tuple custom_sum_definitions 🔹
+    # 🔹 Sidebar UI for Streamlit. Shows sectors for users and allows to set threshold and put checker for tuple custom_sum_definitions 🔹
+    # 🔹 Code: creates index (function key) for inputted customer sum value tuple (values) 🔹
     for i in range(int(sum_count)):
         st.sidebar.write(f"**Custom Sum #{i+1}**")
         cats = st.sidebar.multiselect(
@@ -142,7 +144,7 @@ if uploaded_file:
             .apply(pd.to_numeric, errors="coerce")
         )
 
-        # 🔹🔹🔹 6-d. Apply exclusions. Pre-create an empty string column; later we concatenate reason. Initialise per-category counters 🔹🔹🔹
+        # 🔹🔹🔹 6-d. Apply exclusions. Pre-create an empty string column; later we include exclusion reason. Initialise per-category counters 🔹🔹🔹
         df["Exclusion Reason"] = ""
         exclusion_counts = {cat: 0 for cat in user_thresholds}
 
