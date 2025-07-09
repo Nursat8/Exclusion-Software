@@ -3,15 +3,15 @@ import pandas as pd
 import io
 import openpyxl
 
-# ---------- 0. Title ----------
+# 🔹 0. Title 🔹
 st.title("Company Filtering & Exclusion App")
 
-# ---------- 1. File upload ----------
+# 🔹 1. File upload 🔹
 uploaded_file = st.file_uploader("📂 Upload an S&P file", type=["xlsx"])
 
-# --------------------------------------------------------------------------- #
-# Everything that depends on a file goes INSIDE this block
-# --------------------------------------------------------------------------- #
+🔹--------------------------------------------------------------------------- 🔹
+🔹 Everything that depends on a file goes INSIDE this block
+🔹 --------------------------------------------------------------------------- 🔹
 if uploaded_file:
 
     # 2. 🔹 Exclusion settings. A dictionary with sectors and default percentage values set 🔹
